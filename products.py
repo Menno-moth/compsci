@@ -170,24 +170,44 @@ def server_login():
     main.withdraw()
     servers = tk.Toplevel ()
     servers.title("servers")
-    servers.geometry("1840x1840")
+    servers.geometry("800x600")
     tk.Label(servers,text="This is the server' window!").pack(pady=20)
+    logout = add_logout(servers)
+    servers.bind("<Escape>", logout)
+
+    servers.focus_force()    
+    servers.grab_set()        
+    servers.lift() 
+    
 
 # cooks' page
 def cook_login():
     main.withdraw()
     cooks = tk.Toplevel ()
     cooks.title("cooks")
-    cooks.geometry("1840x1840")
-    tk.Label(servers,text="This is the cooks' window!").pack(pady=20)
+    cooks.geometry("800x600")
+    tk.Label(cooks,text="This is the cooks' window!").pack(pady=20)
+    logout = add_logout(cooks)
+    cooks.bind("<Escape>", logout)
+
+    cooks.focus_force()    
+    cooks.grab_set()        
+    cooks.lift() 
 
 # menno's page
 def manager_login():
     main.withdraw()
     manager = tk.Toplevel ()
     manager.title("manager")
-    manager.geometry("1840x1840")
-    tk.Label(servers,text="This is Menno's manager window!").pack(pady=20)
+    manager.geometry("800x600")
+    tk.Label(manager,text="This is Menno's manager window!").pack(pady=20)
+    logout = add_logout(manager)
+    manager.bind("<Escape>", logout)
+    
+
+    manager.focus_force()    
+    manager.grab_set()        
+    manager.lift() 
     
 # Function to validate the login
 def validate_login():
@@ -206,7 +226,7 @@ def validate_login():
 # Create the main window
 main = tk.Tk()
 main.title("Login")
-main.geometry("1840x1840")
+main.geometry("800x600")
 
 # Create and place the username label and entry
 username_label = tk.Label(main, text="Userid:")
@@ -222,17 +242,44 @@ password_label.pack()
 password_entry = tk.Entry(main, show="*")  # Show asterisks for password
 password_entry.pack()
 
+def toggle_password():
+    if password_entry.cget("show") == "*":
+        password_entry.config(show="")
+    else:
+        password_entry.config(show="*")
+
+show_password_var = tk.BooleanVar()
+
+show_password = tk.Checkbutton(
+    main,
+    text="Show Password",
+    variable=show_password_var,
+    command=toggle_password
+)
+show_password.pack()
+
 # login button
 login_button = tk.Button(main, text="Login", command=validate_login)
 login_button.pack()
+main.bind("<Return>", lambda event: login_button.invoke()) # pressing enter triggers the logout button to be pressed
 
 # logout button
 def add_logout(window):
-    def logout():
+    def logout(event=None):
         window.destroy()
         main.deiconify()
-    logout_button = tk.Button(window, text="Log Out", command=logout)
-    logout_button.place(x=0,y=0)
+        
+        username_entry.delete(0, tk.END)
+        password_entry.delete(0, tk.END)
+        show_password_var.set(False)
+        password_entry.config(show="*")
+
+    logout_button = tk.Button(window, text="Log Out", command=logout, bg="red")
+    logout_button.pack(side="bottom", anchor="w", padx=10, pady=10)
+
+    window.bind("<Escape>", logout)
+
+    return logout
 
 # Start the Tkinter event loop
 main.mainloop()
